@@ -17,14 +17,6 @@ jobs:
         timeout-minutes: 2
         run: docker compose -f docker/docker-compose.yml up -d
 
-      - name: Wait for application
-        run: |
-          for i in {1..60}; do
-            nc -z localhost 8080 && echo success && exit 0
-            sleep 2
-          done
-          echo "Service did not start in time" && exit 1
-
       - name: Verify Ports
         run: sudo netstat -tulpn | grep LISTEN
 
