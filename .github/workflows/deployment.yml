@@ -43,6 +43,7 @@ jobs:
       - name: Run k6 test
         run: |
           docker run --rm --network host \
+            --user $(id -u):$(id -g) \
             -v $(pwd):/scripts \
             -e BASE_URL="http://127.0.0.1:8080" \
             grafana/k6:latest \
@@ -51,10 +52,11 @@ jobs:
 
       - name: Upload Results
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: k6-report-html
           path: summary.html 
 
       - name: Build the docker compose down
-        timeout-minutes: 2
-        run: docker compose down
+        if: always()
+        run: docker compose -f docker/docker-compose.yml down
