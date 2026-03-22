@@ -1,0 +1,52 @@
+name: K6 Performance Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: 
+
+jobs:
+  deploy-k6-test-on-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install docker-compose
+        run: |
+          curl -L "https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
+          sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+      - name: Build the docker-compose up
+        timeout-minutes: 2
+        run: docker-compose up -d
+
+      - name: Check running containers
+        run: docker ps
+
+      - name: Run k6 test
+        uses: grafana/k6-action@v0.3.1
+        with:
+          filename: src/scripts/api/load-test.js
+          flags: --out influxdb=http://${{ secrets.INFLUXDB_HOST }}:8086
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }} 
+
+      - name: Upload Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-report
+          path: summary.html 
+
+      - name: Build the docker compose down
+        timeout-minutes: 2
+        run: docker-compose down
+
+#     - name: Slack Notification
+#       uses: rtCamp/action-slack-notify@v2
+#       if: always()
+#       env:
+#         SLACK_MESSAGE: 'Allure Report: ${{ secrets.VAULT_ADDR }}'
+#         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

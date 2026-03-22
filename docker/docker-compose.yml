@@ -1,0 +1,180 @@
+version: '3.8'
+
+services:
+  # Testing APP (microservices-demo - Online Boutique)
+  online-boutique:
+    image: gcr.io/google-samples/microservices-demo/frontend:v0.3.5
+    container_name: shop-frontend
+    ports:
+      - 8080:8080
+    environment:
+      - PORT=8080
+      - PRODUCT_CATALOG_SERVICE_ADDR=productcatalogservice:3550
+      - CURRENCY_SERVICE_ADDR=currencyservice:7000
+      - CART_SERVICE_ADDR=cartservice:7070
+      - RECOMMENDATION_SERVICE_ADDR=recommendationservice:8080
+      - SHIPPING_SERVICE_ADDR=shippingservice:50051
+      - CHECKOUT_SERVICE_ADDR=checkoutservice:5050
+      - AD_SERVICE_ADDR=adservice:9555
+    networks:
+      - perf-network
+    depends_on:
+      - currencyservice
+      - productcatalogservice
+
+  # Currency Service
+  currencyservice:
+    image: gcr.io/google-samples/microservices-demo/currencyservice:v0.3.5
+    container_name: currency-service
+    environment:
+      - PORT=7000
+      - DISABLE_PROFILER=1
+      - DISABLE_TRACING=1
+      - DISABLE_DEBUGGER=1
+    networks:
+      - perf-network
+
+  # Product Catalog Service
+  productcatalogservice:
+    image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.3.5
+    container_name: product-catalog-service
+    networks:
+      - perf-network
+
+  # Cart Service
+  cartservice:
+    image: gcr.io/google-samples/microservices-demo/cartservice:v0.3.5
+    container_name: cart-service
+    environment:
+      - PORT=7070
+      - REDIS_ADDR=redis-cart:6379
+    networks:
+      - perf-network
+    depends_on:
+      - redis-cart
+
+  # Cart Service need Redis
+  redis-cart:
+    image: redis:alpine
+    container_name: redis-cart
+    networks:
+      - perf-network
+
+  # Shipping Service
+  shippingservice:
+    image: us-central1-docker.pkg.dev/google-samples/microservices-demo/shippingservice:v0.10.1
+    container_name: shipping-service
+    environment:
+      - PORT=50051
+      - DISABLE_TRACING=1
+      - DISABLE_PROFILER=1
+    networks: 
+      - perf-network
+
+  # Checkout Service
+  checkoutservice:
+    image: us-central1-docker.pkg.dev/google-samples/microservices-demo/checkoutservice:v0.10.1
+    container_name: checkout-service
+    environment:
+      - PORT=5050
+      - PRODUCT_CATALOG_SERVICE_ADDR=productcatalogservice:3550
+      - CURRENCY_SERVICE_ADDR=currencyservice:7000
+      - CART_SERVICE_ADDR=cartservice:7070
+      - SHIPPING_SERVICE_ADDR=shippingservice:50051
+      - PAYMENT_SERVICE_ADDR=paymentservice:50051
+      - EMAIL_SERVICE_ADDR=emailservice:5000
+    networks: 
+      - perf-network
+
+  # Payment Service
+  paymentservice:
+    image: us-central1-docker.pkg.dev/google-samples/microservices-demo/paymentservice:v0.10.1
+    container_name: payment-service
+    environment:
+      - PORT=50051
+      - DISABLE_TRACING=1
+      - DISABLE_PROFILER=1
+    networks: 
+      - perf-network
+
+  # Email Service
+  emailservice:
+    image: us-central1-docker.pkg.dev/google-samples/microservices-demo/emailservice:v0.10.1
+    container_name: email-service
+    environment:
+      - PORT=5000
+      - DISABLE_TRACING=1
+      - DISABLE_PROFILER=1
+    networks: 
+      - perf-network
+
+  # Recommendation Service
+  recommendationservice:
+    image: us-central1-docker.pkg.dev/google-samples/microservices-demo/recommendationservice:v0.10.1
+    container_name: recommendation-service
+    environment:
+      - PORT=8080
+      - PRODUCT_CATALOG_SERVICE_ADDR=productcatalogservice:3550
+      - DISABLE_TRACING=1
+      - DISABLE_PROFILER=1
+    networks:
+      - perf-network
+
+  
+
+  # Database (InfluxDB)
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb-perf
+    ports:
+      - 8086:8086
+    environment:
+      - INFLUXDB_DB=k6
+    networks:
+      - perf-network
+    volumes:
+      - influxdb-data:/var/lib/influxdb
+
+  # Data Visualization (Grafana)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-perf
+    ports:
+      - 3000:3000
+    depends_on:
+      - influxdb
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+    networks:
+      - perf-network
+    volumes:
+      - grafana-data:/var/lib/grafana
+  
+  # System Metrics Collection (Prometheus)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-perf
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - perf-network
+
+  # Hardware Metrics Exporter (Node Exporter)
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter-perf
+    ports:
+      - "9100:9100"
+    networks:
+      - perf-network
+
+networks:
+  perf-network:
+    driver: bridge
+
+volumes:
+  influxdb-data:
+  grafana-data:
