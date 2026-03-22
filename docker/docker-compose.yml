@@ -120,6 +120,13 @@ services:
     networks:
       - perf-network
 
+  adservice:
+    image: gcr.io/google-samples/microservices-demo/adservice:v0.3.5
+    container_name: ad-service
+    environment:
+      - PORT=9555
+    networks:
+      - perf-network
   
 
   # Database (InfluxDB)
@@ -130,6 +137,7 @@ services:
       - 8086:8086
     environment:
       - INFLUXDB_DB=k6
+      - INFLUXDB_HTTP_BIND_ADDRESS=:8086
     networks:
       - perf-network
     volumes:

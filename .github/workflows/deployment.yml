@@ -13,40 +13,54 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install docker-compose
-        run: |
-          curl -L "https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          chmod +x /usr/local/bin/docker-compose
-          sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-
       - name: Build the docker-compose up
         timeout-minutes: 2
-        run: docker-compose up -d
+        run: docker compose -f docker/docker-compose.yml up -d
+
+      - name: Wait for Frontend (Healthcheck)
+        run: |
+          echo "Esperando que el puerto 8080 abra..."
+          # Reintenta cada 5 segundos durante 1 minuto
+          timeout 60s bash -c 'until nc -z localhost 8080; do echo "8080 sigue cerrado... reintentando"; sleep 5; done' || true
+          
+          if ! nc -z localhost 8080; then
+            echo "ERROR: El puerto 8080 nunca abrió. Mostrando logs del frontend para debug:"
+            docker logs shop-frontend
+            exit 1
+          fi
+
+      - name: Verify Ports
+        run: sudo netstat -tulpn | grep LISTEN
 
       - name: Check running containers
         run: docker ps
 
-      - name: Run k6 test
-        uses: grafana/k6-action@v0.3.1
-        with:
-          filename: src/scripts/api/load-test.js
-          flags: --out influxdb=http://${{ secrets.INFLUXDB_HOST }}:8086
-        env:
-          BASE_URL: ${{ secrets.BASE_URL }} 
+      - name: Print shop-frontend logs
+        run: docker logs shop-frontend
+      - name: Print influxdb logs
+        run: docker logs influxdb-perf
 
+      - name: Run k6 test
+        run: |
+          docker run --rm --network host \
+            --user $(id -u):$(id -g) \
+            -v $(pwd):/apps \
+            -w /apps \
+            -e BASE_URL="http://127.0.0.1:8080" \
+            grafana/k6:latest \
+            run src/scripts/api/test.js \
+            --out influxdb=http://127.0.0.1:8086/k6
+
+      - name: List files
+        run: ls -R
+        
       - name: Upload Results
         uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: k6-report
+          name: k6-report-html
           path: summary.html 
 
       - name: Build the docker compose down
-        timeout-minutes: 2
-        run: docker-compose down
-
-#     - name: Slack Notification
-#       uses: rtCamp/action-slack-notify@v2
-#       if: always()
-#       env:
-#         SLACK_MESSAGE: 'Allure Report: ${{ secrets.VAULT_ADDR }}'
-#         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        if: always()
+        run: docker compose -f docker/docker-compose.yml down

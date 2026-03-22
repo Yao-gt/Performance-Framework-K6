@@ -1,7 +1,10 @@
 import http from 'k6/http'
+import exec from 'k6/execution';
 import { check, group, sleep } from 'k6'
 import { expect } from 'https://jslib.k6.io/k6-testing/0.6.1/index.js';
 import { SharedArray } from 'k6/data';
+
+import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 
 import { BASE_URL, API_ENDPOINTS, CURRENCIES } from '../../config/config.js'
 
@@ -111,4 +114,10 @@ export default function () {
 
     sleep(1)  
 
+}
+
+export function handleSummary(data) {
+  return {
+    "summary.html": htmlReport(data)
+  };
 }
