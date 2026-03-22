@@ -17,8 +17,13 @@ jobs:
         timeout-minutes: 2
         run: docker compose -f docker/docker-compose.yml up -d
 
-      - name: Wait for services
-        run: sleep 10
+      - name: Wait for application
+        run: |
+          for i in {1..30}; do
+            nc -z localhost 8080 && echo success && exit 0
+            sleep 2
+          done
+          echo "Service did not start in time" && exit 1
 
       - name: Check running containers
         run: docker ps
@@ -30,6 +35,8 @@ jobs:
           flags: --out influxdb=http://localhost:8086/k6
         env:
           BASE_URL: "http://localhost:8080"
+        options: |
+          --network docker_perf-network
 
       - name: Upload Results
         uses: actions/upload-artifact@v4

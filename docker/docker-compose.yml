@@ -20,7 +20,6 @@ services:
     depends_on:
       - currencyservice
       - productcatalogservice
-    network_mode: "host"
 
   # Currency Service
   currencyservice:
@@ -134,7 +133,6 @@ services:
       - perf-network
     volumes:
       - influxdb-data:/var/lib/influxdb
-    network_mode: "host"
 
   # Data Visualization (Grafana)
   grafana:
