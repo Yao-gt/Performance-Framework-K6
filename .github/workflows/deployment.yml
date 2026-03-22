@@ -41,13 +41,13 @@ jobs:
         run: docker logs influxdb-perf
 
       - name: Run k6 test
-        uses: grafana/k6-action@v0.3.1
-        with:
-          filename: src/scripts/api/test.js
-          flags: --out influxdb=http://127.0.0.1:8086/k6
-          options: "--network host"
-        env:
-          BASE_URL: "http://127.0.0.1:8080"
+        run: |
+          docker run --rm --network host \
+            -v $(pwd):/scripts \
+            -e BASE_URL="http://127.0.0.1:8080" \
+            grafana/k6:latest \
+            run /scripts/src/scripts/api/test.js \
+            --out influxdb=http://127.0.0.1:8086/k6
 
       - name: Upload Results
         uses: actions/upload-artifact@v4
