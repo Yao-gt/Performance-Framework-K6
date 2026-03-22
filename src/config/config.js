@@ -1,5 +1,5 @@
 // Homepage URL of the application under test. Can be overridden by setting the BASE_URL environment variable when running the tests.
-export const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080';
+export const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080'
 
 // API endpoints
 export const API_ENDPOINTS = {
@@ -11,4 +11,4 @@ export const API_ENDPOINTS = {
 }
 
 // List of supported currencies for the application
-export const CURRENCIES = ['USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY', 'SEK', 'NZD'];
+export const CURRENCIES = ['USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY', 'SEK', 'NZD']

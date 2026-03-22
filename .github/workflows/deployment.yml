@@ -19,26 +19,17 @@ jobs:
 
       - name: Wait for Frontend (Healthcheck)
         run: |
-          echo "Esperando que el puerto 8080 abra..."
-          # Reintenta cada 5 segundos durante 1 minuto
-          timeout 60s bash -c 'until nc -z localhost 8080; do echo "8080 sigue cerrado... reintentando"; sleep 5; done' || true
+          echo "Waiting for port 8080 to open..."
+          timeout 60s bash -c 'until nc -z localhost 8080; do echo "8080 still closed... retrying"; sleep 5; done' || true
           
           if ! nc -z localhost 8080; then
-            echo "ERROR: El puerto 8080 nunca abrió. Mostrando logs del frontend para debug:"
+            echo "ERROR: The port 8080 never opened. Showing frontend logs for debug:"
             docker logs shop-frontend
             exit 1
           fi
 
-      - name: Verify Ports
-        run: sudo netstat -tulpn | grep LISTEN
-
-      - name: Check running containers
-        run: docker ps
-
-      - name: Print shop-frontend logs
-        run: docker logs shop-frontend
-      - name: Print influxdb logs
-        run: docker logs influxdb-perf
+      - name: Create reports directory
+        run: mkdir -p reports
 
       - name: Run k6 test
         run: |
@@ -47,19 +38,17 @@ jobs:
             -v $(pwd):/apps \
             -w /apps \
             -e BASE_URL="http://127.0.0.1:8080" \
+            -e TEST_NAME="test" \
             grafana/k6:latest \
             run src/scripts/api/test.js \
             --out influxdb=http://127.0.0.1:8086/k6
-
-      - name: List files
-        run: ls -R
-        
+            
       - name: Upload Results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: k6-report-html
-          path: summary.html 
+          name: k6-reports-history
+          path: reports/*.html
 
       - name: Build the docker compose down
         if: always()
