@@ -15,6 +15,7 @@ services:
       - RECOMMENDATION_SERVICE_ADDR=recommendationservice:8080
       - SHIPPING_SERVICE_ADDR=shippingservice:50051
       - CHECKOUT_SERVICE_ADDR=checkoutservice:5050
+      - AD_SERVICE_ADDR=adservice:9555
     networks:
       - perf-network
     depends_on:
@@ -119,6 +120,13 @@ services:
     networks:
       - perf-network
 
+  adservice:
+    image: gcr.io/google-samples/microservices-demo/adservice:v0.3.5
+    container_name: ad-service
+    environment:
+      - PORT=9555
+    networks:
+      - perf-network
   
 
   # Database (InfluxDB)

@@ -17,6 +17,18 @@ jobs:
         timeout-minutes: 2
         run: docker compose -f docker/docker-compose.yml up -d
 
+      - name: Wait for Frontend (Healthcheck)
+        run: |
+          echo "Esperando que el puerto 8080 abra..."
+          # Reintenta cada 5 segundos durante 1 minuto
+          timeout 60s bash -c 'until nc -z localhost 8080; do echo "8080 sigue cerrado... reintentando"; sleep 5; done' || true
+          
+          if ! nc -z localhost 8080; then
+            echo "ERROR: El puerto 8080 nunca abrió. Mostrando logs del frontend para debug:"
+            docker logs shop-frontend
+            exit 1
+          fi
+          
       - name: Verify Ports
         run: sudo netstat -tulpn | grep LISTEN
 
