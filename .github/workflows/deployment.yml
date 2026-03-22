@@ -12,16 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install docker-compose
-        run: |
-          curl -L "https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          chmod +x /usr/local/bin/docker-compose
-          sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-
+      
       - name: Build the docker-compose up
         timeout-minutes: 2
-        run: docker-compose up -d
+        run: docker compose -f docker/docker-compose.yml up -d
+
+      - name: Wait for services
+        run: sleep 10
 
       - name: Check running containers
         run: docker ps
