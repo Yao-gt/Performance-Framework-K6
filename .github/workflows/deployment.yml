@@ -11,6 +11,7 @@ jobs:
   deploy-k6-test-on-docker:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
 
       - name: Build the docker-compose up
         timeout-minutes: 2
