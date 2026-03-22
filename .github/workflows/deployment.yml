@@ -29,21 +29,14 @@ jobs:
           filename: src/scripts/api/test.js
           flags: --out influxdb=http://localhost:8086/k6
         env:
-          BASE_URL: http://localhost:8080
+          BASE_URL: "http://localhost:8080"
 
       - name: Upload Results
         uses: actions/upload-artifact@v4
         with:
-          name: k6-report
+          name: k6-report-html
           path: summary.html 
 
       - name: Build the docker compose down
         timeout-minutes: 2
-        run: docker-compose down
-
-#     - name: Slack Notification
-#       uses: rtCamp/action-slack-notify@v2
-#       if: always()
-#       env:
-#         SLACK_MESSAGE: 'Allure Report: ${{ secrets.VAULT_ADDR }}'
-#         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: docker compose down
