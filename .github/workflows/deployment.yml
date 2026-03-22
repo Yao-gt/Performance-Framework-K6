@@ -38,7 +38,7 @@ jobs:
       - name: Print shop-frontend logs
         run: docker logs shop-frontend
       - name: Print influxdb logs
-        run: docker logs influxdb
+        run: docker logs influxdb-perf
 
       - name: Run k6 test
         uses: grafana/k6-action@v0.3.1
