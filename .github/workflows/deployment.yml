@@ -19,11 +19,14 @@ jobs:
 
       - name: Wait for application
         run: |
-          for i in {1..30}; do
+          for i in {1..60}; do
             nc -z localhost 8080 && echo success && exit 0
             sleep 2
           done
           echo "Service did not start in time" && exit 1
+
+      - name: Verify Ports
+        run: sudo netstat -tulpn | grep LISTEN
 
       - name: Check running containers
         run: docker ps
@@ -35,8 +38,6 @@ jobs:
           flags: --out influxdb=http://localhost:8086/k6
         env:
           BASE_URL: "http://localhost:8080"
-        options: |
-          --network docker_perf-network
 
       - name: Upload Results
         uses: actions/upload-artifact@v4
