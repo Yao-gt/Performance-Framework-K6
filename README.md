@@ -78,7 +78,9 @@ my-project/
 ## Examples of Grafana dashboards
 
 1. k6 metris in Influxdb : https://grafana.com/grafana/dashboards/10660-k6-load-testing-results/
+![k6 Dashboard](https://github.com/user-attachments/assets/0986d290-d4b3-4f42-b22b-17ddfd6511e0)
 2. Node Exporter metrics in Prometheus: https://grafana.com/grafana/dashboards/1860-node-exporter-full/
+![Node Exporter Dashboard](https://github.com/user-attachments/assets/3a967da7-0a08-4f0d-a32e-c7f22faa995e)
 
 ## Appendices
 
