@@ -19,21 +19,21 @@ const products = new SharedArray('Products from Products.json file', function ()
 
 export const options = {
    scenarios: {
-    // smoke_1_vu: {
-    //   executor: 'shared-iterations',
-    //   vus: 1,
-    //   iterations: 3
-    // },
-    smoke_ramping: {
-      executor: 'ramping-vus',
-      startvus: 0,
-      stages: [
-        { target: 5, duration: '10s' },
-        { target: 5, duration: '10m' },
-        { target: 0, duration: '5s' }
-      ],
-      gracefulRampDown: '1s',
-    }
+    smoke_1_vu: {
+      executor: 'shared-iterations',
+      vus: 1,
+      iterations: 3
+    },
+    // smoke_ramping: {
+    //   executor: 'ramping-vus',
+    //   startvus: 0,
+    //   stages: [
+    //     { target: 5, duration: '10s' },
+    //     { target: 5, duration: '10m' },
+    //     { target: 0, duration: '5s' }
+    //   ],
+    //   gracefulRampDown: '1s',
+    // }
   },
 }
 
