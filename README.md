@@ -56,7 +56,7 @@ my-project/
 
 1. Start the infrastructure using Docker Compose in the Docker Desktop console:  
    ```bash
-   docker compose up -d influxdb cadvisor prometheus grafana
+   docker compose up -d
    ```
     - `-d` runs the process in the background so you can continue working in the terminal while everything runs in the background.
 2. In the project folder, run the test on src/scripts/api/ (for example) using the following command:
