@@ -1,4 +1,4 @@
-version: '3.8'
+name: perf-testing-k6
 
 services:
   # Testing APP (microservices-demo - Online Boutique)
