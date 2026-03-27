@@ -51,8 +51,7 @@ jobs:
 
       - name: Run k6 ui performance test
         run: |
-          docker run --rm 
-            --privileged \
+          docker run --rm --privileged \
             --network host \
             --shm-size=2gb \
             --user root \
