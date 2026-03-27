@@ -4,7 +4,7 @@ import { browser } from 'k6/browser';
 import { sleep, check, fail } from 'k6';
 
 import { BASE_URL } from '../../config/config.js'
-import { homePage } from '../browser/pages/homepage.js';
+import { homePage } from '../browser/pages/homePage.js';
 import { formatNameFile } from '../../config/utils.js'
 
 export const options = {
