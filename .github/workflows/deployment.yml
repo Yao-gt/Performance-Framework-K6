@@ -31,14 +31,14 @@ jobs:
       - name: Create reports directory
         run: mkdir -p reports
 
-      - name: Run k6 test
+      - name: Run k6 api test
         run: |
           docker run --rm --network host \
             --user $(id -u):$(id -g) \
             -v $(pwd):/apps \
             -w /apps \
             -e BASE_URL="http://127.0.0.1:8080" \
-            -e TEST_NAME="test" \
+            -e TEST_NAME="api_test" \
             grafana/k6:latest \
             run src/scripts/api/test.js \
             --out influxdb=http://127.0.0.1:8086/k6
@@ -49,6 +49,18 @@ jobs:
         with:
           name: k6-reports-history
           path: reports/*.html
+
+      - name: Run k6 ui performance test
+        run: |
+          docker run --rm --network host \
+            --user $(id -u):$(id -g) \
+            -v $(pwd):/apps \
+            -w /apps \
+            -e BASE_URL="http://127.0.0.1:8080" \
+            -e TEST_NAME="ui_test" \
+            grafana/k6:latest \
+            run src/scripts/browser/ui-performance.js \
+            --out influxdb=http://127.0.0.1:8086/k6
 
       - name: Build the docker compose down
         if: always()
