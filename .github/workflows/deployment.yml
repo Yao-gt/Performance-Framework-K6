@@ -63,6 +63,10 @@ jobs:
             grafana/k6:latest-with-browser \
             run src/scripts/browser/ui-performance.js \
             --out influxdb=http://127.0.0.1:8086/k6
+      
+      - name: Fix permissions for artifacts
+        if: always()
+        run: sudo chmod -R 777 browser_evidences/ reports/
 
       - name: Upload Browser Evidences
         uses: actions/upload-artifact@v4
