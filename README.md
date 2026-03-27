@@ -56,12 +56,12 @@ my-project/
 
 1. Start the infrastructure using Docker Compose in the Docker Desktop console:  
    ```bash
-   docker compose up -d influxdb cadvisor prometheus grafana
+   docker compose up -d
    ```
     - `-d` runs the process in the background so you can continue working in the terminal while everything runs in the background.
-2. In the project folder, run the test on src/scripts/api/ (for example) using the following command:
+2. In the project folder, run the test on src/scripts/api/ (for example) with a test name using the following command:
    ```bash
-   k6 run --out influxdb=http://localhost:8086 src/scripts/api/test.js
+   k6 run --out influxdb=http://localhost:8086 -e TEST_NAME=test_name src/scripts/api/test.js
    ```
 3. After running the test on the docker console, you will see a new file in the reports folder which contains the metrics related to the test in a html format.
 4. You can create your own dashboards in Grafana (http://localhost:3000/dashboards) using metrics from datasources like Prometheus and Influxdb

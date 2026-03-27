@@ -8,6 +8,7 @@ import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporte
 import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js"
 
 import { BASE_URL, API_ENDPOINTS, CURRENCIES } from '../../config/config.js'
+import { formatNameFile } from '../../config/utils.js'
 
 
 const products = new SharedArray('Products from Products.json file', function () {
@@ -128,12 +129,11 @@ export default function () {
 }
 
 export function handleSummary(data) {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
-  const testName = __ENV.TEST_NAME || 'smoke-test'
-  const reportPath = `reports/${testName}_${timestamp}.html`
+    const formatTestName = formatNameFile()
+    const reportPath = `reports/${formatTestName}.html`
   
-  return {
+    return {
     [reportPath]: htmlReport(data),
     'stdout': textSummary(data, { indent: ' ', enableColors: true })
-  }
+    }
 }
