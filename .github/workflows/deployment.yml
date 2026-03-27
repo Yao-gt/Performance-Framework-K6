@@ -56,7 +56,8 @@ jobs:
             -w /apps \
             -e BASE_URL="http://127.0.0.1:8080" \
             -e TEST_NAME="ui_test" \
-            grafana/k6:latest \
+            -e K6_BROWSER_ENABLED=true \
+            grafana/k6:latest-with-browser \
             run src/scripts/browser/ui-performance.js \
             --out influxdb=http://127.0.0.1:8086/k6
 
