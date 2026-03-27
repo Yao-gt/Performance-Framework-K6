@@ -51,9 +51,11 @@ jobs:
 
       - name: Run k6 ui performance test
         run: |
-          docker run --rm --network host \
+          docker run --rm 
+            --privileged \
+            --network host \
             --shm-size=2gb \
-            --user $(id -u):$(id -g) \
+            --user root \
             -v $(pwd):/apps \
             -w /apps \
             -e BASE_URL="http://127.0.0.1:8080" \
