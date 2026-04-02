@@ -133,7 +133,7 @@ export function handleSummary(data) {
     const reportPath = `reports/${formatTestName}.html`
   
     return {
-    [reportPath]: htmlReport(data),
-    'stdout': textSummary(data, { indent: ' ', enableColors: true })
+        [reportPath]: htmlReport(data),
+        'stdout': textSummary(data, { indent: ' ', enableColors: true })
     }
 }
