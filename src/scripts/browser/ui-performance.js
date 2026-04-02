@@ -16,7 +16,7 @@ export const options = {
     smoke_1_vu: {
       executor: 'shared-iterations',
       vus: 1,
-      iterations: 1,
+      iterations: 5,
       options: {
         browser: {
           type: 'chromium',
